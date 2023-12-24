@@ -1,0 +1,40 @@
+---
+# tasks file for roles/docker-installation
+- name: Update all packages to their latest version
+  apt:
+    update_cache: yes
+    force_apt_get: yes
+- name: Installing ca-certificates, curl, gnupg, lsb-release a list of packages
+  apt:
+    pkg:
+    - ca-certificates
+    - curl
+    - gnupg
+    - lsb-release
+- name: Add Docker GPG key
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+- name: Add Docker APT repository for Ubuntu18.04
+  apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable
+  when: ansible_facts['distribution'] == "Ubuntu" and ansible_facts['distribution_major_version'] == "18" # Only Ubuntu 18.04
+- name: Add Docker APT repository for Ubuntu20.04
+  apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
+  when: ansible_facts['distribution'] == "Ubuntu" and ansible_facts['distribution_major_version'] == "20" # Only Ubuntu 20.04
+- name: Add Docker APT repository for Ubuntu22.04
+  apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu jammy stable
+  when: (ansible_facts['distribution'] == "Ubuntu" and ansible_facts['distribution_major_version'] == "22") # Only Ubuntu 20.04
+- name: Install Docker CE
+  apt:
+    pkg:
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+    update_cache: yes  
+- name: Install docker-compose
+  get_url: 
+     url : https://github.com/docker/compose/releases/download/1.25.1-rc1/docker-compose-Linux-x86_64
+     dest: /usr/local/bin/docker-compose
+     mode: 'u+x,g+x'
